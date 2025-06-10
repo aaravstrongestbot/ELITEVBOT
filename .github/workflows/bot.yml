@@ -17,6 +17,9 @@ concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -40,4 +43,4 @@ jobs:
           chmod +x ./engines/stockfish
 
       - name: Running bot
-        run: python -u user_interface.py --matchmaking
+        run: python -u user_interface.py
