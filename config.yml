@@ -4,7 +4,7 @@ engines:
   bullet:
     dir: "./engines"
     name: "stockfish"
-    ponder: false
+    ponder: true
     silence_stderr: false
     move_overhead_multiplier: 3.0
     uci_options:
@@ -14,7 +14,7 @@ engines:
   blitz:
     dir: "./engines"
     name: "stockfish"
-    ponder: false
+    ponder: true
     silence_stderr: false
     move_overhead_multiplier: 1.0
     uci_options:
@@ -24,7 +24,7 @@ engines:
   chess960:
     dir: "./engines"
     name: "stockfish"
-    ponder: false
+    ponder: true
     silence_stderr: false
     move_overhead_multiplier: 2.5
     uci_options:
@@ -47,7 +47,7 @@ engines:
 
 syzygy:
   standard:
-    enabled: false                        # Activate local syzygy endgame tablebases.
+    enabled: true                        # Activate local syzygy endgame tablebases.
     paths:                                # Paths to local syzygy endgame tablebases.
       - "./engines/syzygy"
     max_pieces: 7                         # Count of max pieces in the local syzygy endgame tablebases.
