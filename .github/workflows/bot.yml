@@ -1,8 +1,5 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Run bot
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
   push:
@@ -10,37 +7,59 @@ on:
       - "main"
     paths:
       - "user_interface.py"
-  schedule:
-    - cron: "1 */5 * * *"
 
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: false
-
-permissions:
-  contents: write
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
+    concurrency:
+      group: bot-run
+      cancel-in-progress: false  # Keep this false for fastest restarts
+
     runs-on: ubuntu-latest
+    timeout-minutes: 355  # Just under 6-hour GitHub limit
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Python Dependency Installation
-        uses: py-actions/py-dependency-install@v4.0.0
-        
-      - name: Injection For my Repo
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Inject Secret Token
         run: sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.LICHESS_KEY }}/g" config.yml
-          
-      - name: Stockfish
-        run: |
-          chmod +x ./engines/stockfish
 
-      - name: Running bot
-        run: python -u user_interface.py --matchmaking
+      - name: Make Stockfish Executable
+        run: chmod +x ./engines/stockfish
+
+      - name: Run Bot
+        run: |
+          echo "Starting bot..."
+          python -u user_interface.py --upgrade --matchmaking  &
+          PID=$!
+          
+          # Auto-exit after 350 minutes (so restart runs without overlap)
+          ( sleep 21000 && echo "Time up. Killing bot..." && kill -SIGTERM $PID ) &
+          
+          wait $PID
+          echo "Bot ended cleanly."
+
+      - name: 🔁 Self-Restart (Fire-and-Forget)
+        if: always()
+        run: gh workflow run main.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
