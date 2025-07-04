@@ -9,8 +9,8 @@ engines:
     move_overhead_multiplier: 3.0
     uci_options:
       Threads: 1
-      Hash: 4096
-      Move Overhead: 1000
+      Hash: 1
+      Move Overhead: 5000
   blitz:
     dir: "./engines"
     name: "stockfish"
@@ -19,8 +19,8 @@ engines:
     move_overhead_multiplier: 3.0
     uci_options:
       Threads: 1
-      Hash: 4096
-      Move Overhead: 1000
+      Hash: 1
+      Move Overhead: 5000
   chess960:
     dir: "./engines"
     name: "stockfish"
@@ -29,8 +29,8 @@ engines:
     move_overhead_multiplier: 3.0
     uci_options:
       Threads: 1
-      Hash: 4096
-      Move Overhead: 2000
+      Hash: 1
+      Move Overhead: 5000
 # variants:                               # Engine used for variants when no suitable special engine is configured.
 #   dir: "./engines"                      # Directory containing the engine.
 #   name: "fairy-stockfish"               # Binary name of the engine to use.
